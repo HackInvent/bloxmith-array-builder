@@ -1,0 +1,47 @@
+{
+  "kind": "array_builder",
+  "title": "Array Builder",
+  "ports": {
+    "inputs": [
+      {
+        "id": 1,
+        "name": "items",
+        "title": "Items",
+        "accepts": [
+          "application/json",
+          "text/plain",
+          "message/*"
+        ],
+        "multiplicity": "many",
+        "required": true,
+        "execution_requirement": "required_for_execution"
+      }
+    ],
+    "outputs": [
+      {
+        "id": 1,
+        "name": "array",
+        "title": "Array",
+        "emits": [
+          "application/json",
+          "message/*"
+        ],
+        "multiplicity": "many"
+      }
+    ]
+  },
+  "config": {
+    "mode": "auto"
+  },
+  "port_capabilities": {
+    "can_add_inputs": false,
+    "can_add_outputs": false
+  },
+  "runtime": {
+    "initial_state": "waiting",
+    "runtime_executable": true,
+    "active_worker": true,
+    "centralized_executor": "generic",
+    "centralized_dependency_mode": "all_inputs"
+  }
+}
