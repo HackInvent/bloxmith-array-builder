@@ -150,10 +150,10 @@ def test_block_ui() -> None:
     inspector_html = str(render_block_inspector_panel("array_builder", {"node": node}).get("html") or "")
     card_html = str(render_block_node_card("array_builder", {"node": node}).get("html") or "")
 
-    expect('data-block-config-field="mode"' in modal_html, "Le modal doit exposer le mode via le binding générique.")
-    expect('<option value="json" selected>' in modal_html, "Le modal doit sélectionner le mode JSON.")
-    expect('data-block-config-field="mode"' in inspector_html, "L'inspector doit exposer le mode.")
-    expect("Items -&gt; JSON array" in card_html, "La node-card doit afficher le rôle du bloc.")
+    expect('data-block-config-field="mode"' in modal_html, "The modal must expose the mode through the generic binding.")
+    expect('<option value="json" selected>' in modal_html, "The modal must select the JSON mode.")
+    expect('data-block-config-field="mode"' in inspector_html, "The inspector must expose the mode.")
+    expect("Items -&gt; JSON array" in card_html, "The node card must show the block's role.")
 
 
 def run_runtime_case(runtime_mode: str) -> None:
@@ -186,7 +186,7 @@ def run_runtime_case(runtime_mode: str) -> None:
         if runtime_mode == "zeromq_active":
             expect(
                 run.get("results", {}).get("array-builder-1", {}).get("transport") == "zeromq_active",
-                "Array Builder doit être exécuté via zeromq_active.",
+                "Array Builder must run through zeromq_active.",
             )
 
 

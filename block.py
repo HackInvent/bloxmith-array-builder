@@ -64,7 +64,7 @@ class ArrayBuilderBlock(BlockDefinition):
             payload=payload,
             replacements={
                 "mode_options": self._mode_options_html(mode),
-                "description": escape("Construit un tableau JSON avec une entrée par valeur reçue sur le port Items."),
+                "description": escape("Builds a JSON array with one entry per value received on the Items port."),
             },
         )
         return {"html": html, "context": {"node_id": str(node.get("id") or ""), "mode": mode, "full_panel": True}}
@@ -78,7 +78,7 @@ class ArrayBuilderBlock(BlockDefinition):
         html = html.replace("{{ mode_options }}", self._mode_options_html(mode))
         html = html.replace(
             "{{ mode_help }}",
-            escape("auto parse JSON/nombres si possible; text garde le texte; number/json sont stricts."),
+            escape("auto parses JSON/numbers when possible; text keeps the text; number/json are strict."),
         )
         return {"html": html, "context": {"node_id": str(node.get("id") or ""), "node_kind": self.kind, "mode": mode}}
 
