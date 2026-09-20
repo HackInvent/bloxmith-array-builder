@@ -38,13 +38,6 @@ class ArrayBuilderBlock(BlockDefinition):
 
     kind = "array_builder"
 
-    def ui_assets(self, surface: str = "modal") -> list[dict[str, str]]:
-        """Return block-owned frontend assets for the requested UI surface."""
-
-        if surface == "modal":
-            return [{"kind": "js", "path": "assets/js/block_modal.js"}]
-        return []
-
     def render_node_card(self, *, node: dict[str, Any], payload: dict[str, Any] | None = None) -> dict[str, Any]:
         """Render the Array Builder canvas card body."""
 
