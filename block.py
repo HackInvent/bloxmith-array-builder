@@ -198,9 +198,9 @@ class ArrayBuilderBlock(BlockDefinition):
         try:
             parsed = self._parse_json(value)
         except ValueError as exc:
-            raise ValueError(f"item numérique invalide: {str(value)[:80]}") from exc
+            raise ValueError(f"invalid numeric item: {str(value)[:80]}") from exc
         if isinstance(parsed, bool) or not isinstance(parsed, (int, float)):
-            raise ValueError(f"item numérique invalide: {str(value)[:80]}")
+            raise ValueError(f"invalid numeric item: {str(value)[:80]}")
         return parsed
 
     def _mode_options_html(self, selected_mode: str) -> str:

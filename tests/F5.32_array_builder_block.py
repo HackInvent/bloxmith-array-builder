@@ -139,7 +139,7 @@ def test_direct_execution() -> None:
         )
     )
     expect(number_failure.status == "failed", "Array Builder number must fail on a non-numeric value.")
-    expect("numérique invalide" in str(number_failure.error), "Erreur number mode insuffisamment claire.")
+    expect("invalid numeric item" in str(number_failure.error), "The number mode error is not explicit enough.")
 
 
 def test_block_ui() -> None:
