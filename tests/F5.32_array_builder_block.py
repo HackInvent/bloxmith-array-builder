@@ -127,10 +127,10 @@ def test_direct_execution() -> None:
             ),
         )
     )
-    expect(result.status == "success", "Array Builder auto doit réussir.")
+    expect(result.status == "success", "Array Builder auto must succeed.")
     parsed = json.loads(result.outputs[0].value)
-    expect(parsed == ["hello", 42, {"name": "demo"}], "Array Builder auto ne parse pas correctement les items.")
-    expect(result.metadata.get("array_builder", {}).get("item_count") == 3, "Le metadata item_count est incorrect.")
+    expect(parsed == ["hello", 42, {"name": "demo"}], "Array Builder auto does not parse the items correctly.")
+    expect(result.metadata.get("array_builder", {}).get("item_count") == 3, "The item_count metadata is wrong.")
 
     number_failure = block.execute_runtime(
         direct_context(
@@ -138,7 +138,7 @@ def test_direct_execution() -> None:
             events=(item_event("edge-a", "not-a-number", source_node_id="text-a"),),
         )
     )
-    expect(number_failure.status == "failed", "Array Builder number doit échouer sur une valeur non numérique.")
+    expect(number_failure.status == "failed", "Array Builder number must fail on a non-numeric value.")
     expect("numérique invalide" in str(number_failure.error), "Erreur number mode insuffisamment claire.")
 
 
@@ -176,7 +176,7 @@ def run_runtime_case(runtime_mode: str) -> None:
         )
         created = create_run_api(server, document, runtime_mode=runtime_mode)
         run = wait_for_run_terminal(server, str(created.get("run_id") or ""), timeout_sec=20)
-        expect(run.get("status") == "success", f"Le run Array Builder {runtime_mode} doit réussir.")
+        expect(run.get("status") == "success", f"The Array Builder {runtime_mode} run must succeed.")
         output = run.get("output_values", {}).get("array-builder-1:1", {}).get("value")
         expect(json.loads(output or "[]") == [42, {"name": "demo"}], f"Sortie Array Builder incorrecte en {runtime_mode}.")
         expect(
