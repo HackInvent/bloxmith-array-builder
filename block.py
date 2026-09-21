@@ -48,8 +48,8 @@ class ArrayBuilderBlock(BlockDefinition):
             node_classes=["array-builder-node"],
             replacements={
                 "title": node.get("title") or self.default_title(),
-                "preview": "Items -> JSON array",
-                "mode": f"mode: {mode}",
+                "preview": self.translate("block.array_builder.preview", fallback="Items -> JSON array"),
+                "mode": self.translate("block.array_builder.card_mode", {"mode": mode}, fallback=f"mode: {mode}"),
                 # The mode name travels next to the marker, so a language change keeps it.
                 "mode_name": mode,
             },
@@ -66,7 +66,10 @@ class ArrayBuilderBlock(BlockDefinition):
             payload=payload,
             replacements={
                 "mode_options": self._mode_options_html(mode),
-                "description": escape("Builds a JSON array with one entry per value received on the Items port."),
+                "description": escape(self.translate(
+                    "block.array_builder.description",
+                    fallback="Builds a JSON array with one entry per value received on the Items port.",
+                )),
             },
         )
         return {"html": html, "context": {"node_id": str(node.get("id") or ""), "mode": mode, "full_panel": True}}
@@ -80,7 +83,10 @@ class ArrayBuilderBlock(BlockDefinition):
         html = html.replace("{{ mode_options }}", self._mode_options_html(mode))
         html = html.replace(
             "{{ mode_help }}",
-            escape("auto parses JSON/numbers when possible; text keeps the text; number/json are strict."),
+            escape(self.translate(
+                "block.array_builder.mode_help",
+                fallback="auto parses JSON/numbers when possible; text keeps the text; number/json are strict.",
+            )),
         )
         return {"html": html, "context": {"node_id": str(node.get("id") or ""), "node_kind": self.kind, "mode": mode}}
 
@@ -216,6 +222,7 @@ class ArrayBuilderBlock(BlockDefinition):
         }
         return "\n".join(
             f'<option value="{escape(mode, quote=True)}"{" selected" if mode == selected_mode else ""} '
-            f'data-i18n="block.array_builder.mode_{mode}">{escape(label)}</option>'
+            f'data-i18n="block.array_builder.mode_{mode}">'
+            f'{escape(self.translate(f"block.array_builder.mode_{mode}", fallback=label))}</option>'
             for mode, label in labels.items()
         )
