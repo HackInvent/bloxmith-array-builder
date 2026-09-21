@@ -50,8 +50,8 @@ class ArrayBuilderBlock(BlockDefinition):
                 "title": node.get("title") or self.default_title(),
                 "preview": "Items -> JSON array",
                 "mode": f"mode: {mode}",
-                # The mode name travels as a parameter so a language change keeps it.
-                "mode_params": escape(json.dumps({"mode": mode}), quote=True),
+                # The mode name travels next to the marker, so a language change keeps it.
+                "mode_name": mode,
             },
         )
 
