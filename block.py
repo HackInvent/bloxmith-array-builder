@@ -8,9 +8,9 @@
 
 from __future__ import annotations
 
+import json
 from html import escape
 from typing import Any
-import json
 
 from bloxsmith_app.block_api import (
     APPLICATION_JSON,
@@ -50,6 +50,8 @@ class ArrayBuilderBlock(BlockDefinition):
                 "title": node.get("title") or self.default_title(),
                 "preview": "Items -> JSON array",
                 "mode": f"mode: {mode}",
+                # The mode name travels as a parameter so a language change keeps it.
+                "mode_params": escape(json.dumps({"mode": mode}), quote=True),
             },
         )
 
@@ -213,7 +215,7 @@ class ArrayBuilderBlock(BlockDefinition):
             "json": "JSON",
         }
         return "\n".join(
-            f'<option value="{escape(mode, quote=True)}"{" selected" if mode == selected_mode else ""}>'
-            f"{escape(label)}</option>"
+            f'<option value="{escape(mode, quote=True)}"{" selected" if mode == selected_mode else ""} '
+            f'data-i18n="block.array_builder.mode_{mode}">{escape(label)}</option>'
             for mode, label in labels.items()
         )

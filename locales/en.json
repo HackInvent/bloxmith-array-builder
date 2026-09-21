@@ -1,0 +1,14 @@
+{
+  "block.array_builder.model.title": "Array Builder",
+  "block.array_builder.pill": "Array",
+  "block.array_builder.preview": "Items -> JSON array",
+  "block.array_builder.card_mode": "mode: {mode}",
+  "block.array_builder.conversion_label": "Conversion",
+  "block.array_builder.mode_label": "Conversion mode",
+  "block.array_builder.mode_auto": "Auto",
+  "block.array_builder.mode_text": "Text",
+  "block.array_builder.mode_number": "Number",
+  "block.array_builder.mode_json": "JSON",
+  "block.array_builder.mode_help": "auto parses JSON/numbers when possible; text keeps the text; number/json are strict.",
+  "block.array_builder.description": "Builds a JSON array with one entry per value received on the Items port."
+}

@@ -1,0 +1,14 @@
+{
+  "block.array_builder.model.title": "Constructeur de tableau",
+  "block.array_builder.pill": "Tableau",
+  "block.array_builder.preview": "Items -> tableau JSON",
+  "block.array_builder.card_mode": "mode : {mode}",
+  "block.array_builder.conversion_label": "Conversion",
+  "block.array_builder.mode_label": "Mode de conversion",
+  "block.array_builder.mode_auto": "Auto",
+  "block.array_builder.mode_text": "Texte",
+  "block.array_builder.mode_number": "Nombre",
+  "block.array_builder.mode_json": "JSON",
+  "block.array_builder.mode_help": "auto interprète le JSON et les nombres si possible ; text conserve le texte ; number et json sont stricts.",
+  "block.array_builder.description": "Construit un tableau JSON avec une entrée par valeur reçue sur le port Items."
+}

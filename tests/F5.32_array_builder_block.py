@@ -151,7 +151,7 @@ def test_block_ui() -> None:
     card_html = str(render_block_node_card("array_builder", {"node": node}).get("html") or "")
 
     expect('data-block-config-field="mode"' in modal_html, "The modal must expose the mode through the generic binding.")
-    expect('<option value="json" selected>' in modal_html, "The modal must select the JSON mode.")
+    expect('<option value="json" selected ' in modal_html, "The modal must select the JSON mode.")
     expect('data-block-config-field="mode"' in inspector_html, "The inspector must expose the mode.")
     expect("Items -&gt; JSON array" in card_html, "The node card must show the block's role.")
 
