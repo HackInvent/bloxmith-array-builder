@@ -41,6 +41,7 @@ from ui_smoke_common import (  # noqa: E402
     text_node,
     wait_for_run_terminal,
 )
+from block_test_packages import install_test_package  # noqa: E402
 
 from blocs.array_builder.block import ArrayBuilderBlock  # noqa: E402
 from bloxsmith_app.block_runtime import BlockInputEvent, BlockRuntimeContext  # noqa: E402
@@ -141,6 +142,19 @@ def test_direct_execution() -> None:
     expect(number_failure.status == "failed", "Array Builder number must fail on a non-numeric value.")
     expect("invalid numeric item" in str(number_failure.error), "The number mode error is not explicit enough.")
 
+    invalid_numbers = ("NaN", "Infinity", "-Infinity", "1e999", "-1e999")
+    for mode in ("number", "json"):
+        for value in invalid_numbers + (("{\"nested\":[NaN]}",) if mode == "json" else ()):
+            result = block.execute_runtime(direct_context(
+                mode=mode, events=(item_event("edge-a", value, source_node_id="text-a"),)))
+            expect(result.status == "failed" and not result.outputs,
+                   f"Strict {mode} accepted non-JSON numeric data: {value}")
+    for value in (*invalid_numbers, '{"nested":[Infinity]}'):
+        result = block.execute_runtime(direct_context(
+            mode="auto", events=(item_event("edge-a", value, source_node_id="text-a"),)))
+        expect(result.status == "success" and json.loads(result.outputs[0].value) == [value],
+               "Auto must preserve non-JSON input as text, not emit non-finite numbers.")
+
 
 def test_block_ui() -> None:
     """Validate block-owned modal, inspector, and node-card rendering."""
@@ -156,16 +170,20 @@ def test_block_ui() -> None:
     expect("Items -&gt; JSON array" in card_html, "The node card must show the block's role.")
 
 
-def run_runtime_case(runtime_mode: str) -> None:
-    """Run text -> Array Builder -> display through the public run API."""
+def run_runtime_case(runtime_mode: str, *, origin: str | None = None, invalid: bool = False) -> None:
+    """Exercise current sources through bundled/managed/linked hosts, including strict failures."""
 
     with isolated_server() as server:
+        node = array_builder_node(mode="number" if invalid else "auto")
+        if origin:
+            model = install_test_package(server, "array_builder", origin=origin)
+            node["block_version"] = model["version"]
         document = graph_payload(
             f"F5 Array Builder {runtime_mode}",
             [
-                text_node("text-a", "Text A", "42", 80, 80),
-                text_node("text-b", "Text B", '{"name":"demo"}', 80, 240),
-                array_builder_node(mode="auto"),
+                text_node("text-a", "Text A", "NaN" if invalid else "42", 80, 80),
+                text_node("text-b", "Text B", "1" if invalid else '{"name":"demo"}', 80, 240),
+                node,
                 display_node("display-1", "Display", 760, 160),
             ],
             [
@@ -176,6 +194,11 @@ def run_runtime_case(runtime_mode: str) -> None:
         )
         created = create_run_api(server, document, runtime_mode=runtime_mode)
         run = wait_for_run_terminal(server, str(created.get("run_id") or ""), timeout_sec=20)
+        if invalid:
+            expect(run.get("status") == "failed", f"Strict invalid JSON did not fail in {runtime_mode}: {run}")
+            expect(not run.get("output_values", {}).get("array-builder-1:1"),
+                   "Invalid JSON must never be published to the next block.")
+            return
         expect(run.get("status") == "success", f"The Array Builder {runtime_mode} run must succeed.")
         output = run.get("output_values", {}).get("array-builder-1:1", {}).get("value")
         expect(json.loads(output or "[]") == [42, {"name": "demo"}], f"Sortie Array Builder incorrecte en {runtime_mode}.")
@@ -193,8 +216,10 @@ def run_runtime_case(runtime_mode: str) -> None:
 def main() -> None:
     test_direct_execution()
     test_block_ui()
-    run_runtime_case("centralized")
-    run_runtime_case("zeromq_active")
+    for mode in ("centralized", "zeromq_active"):
+        for origin in (None, "managed", "linked"):
+            run_runtime_case(mode, origin=origin)
+        run_runtime_case(mode, origin="managed", invalid=True)
     print("[ok] F5.32_array_builder_block")
 
 

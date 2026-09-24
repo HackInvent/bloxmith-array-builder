@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import json
+import math
 from html import escape
 from typing import Any
 
@@ -143,7 +144,9 @@ class ArrayBuilderBlock(BlockDefinition):
         raw_values = self.collect_values(context)
         try:
             array_items = [self.convert_item(value, mode=mode) for value in raw_values]
-        except ValueError as exc:
+            # The output is application/json, not Python's optional NaN/Infinity dialect.
+            payload = json.dumps(array_items, ensure_ascii=False, indent=2, allow_nan=False)
+        except (ValueError, TypeError) as exc:
             message = str(exc)
             return BlockRuntimeResult(
                 status="failed",
@@ -156,7 +159,6 @@ class ArrayBuilderBlock(BlockDefinition):
                 worker_received="-",
             )
 
-        payload = json.dumps(array_items, ensure_ascii=False, indent=2)
         outputs = [
             BlockRuntimeOutput(
                 port_id=int(getattr(port, "id", 0) or 0),
@@ -178,7 +180,7 @@ class ArrayBuilderBlock(BlockDefinition):
         )
 
     def _parse_auto(self, value: Any) -> Any:
-        """Parse JSON-looking text while preserving plain strings."""
+        """Parse finite JSON values while preserving invalid JSON verbatim as text."""
 
         if not isinstance(value, str):
             return value
@@ -186,19 +188,28 @@ class ArrayBuilderBlock(BlockDefinition):
         if not text:
             return ""
         try:
-            return json.loads(text)
-        except json.JSONDecodeError:
+            return self._parse_json(text)
+        except ValueError:
             return value
 
     def _parse_json(self, value: Any) -> Any:
-        """Parse one item as strict JSON or raise a clear ValueError."""
+        """Parse JSON with finite numbers, rejecting constants and exponent overflow."""
 
         if not isinstance(value, str):
             return value
         try:
-            return json.loads(value.strip())
-        except json.JSONDecodeError as exc:
-            raise ValueError(f"item JSON invalide: {value[:80]}") from exc
+            return json.loads(value.strip(), parse_float=self._parse_finite_float,
+                              parse_constant=self._parse_finite_float)
+        except ValueError as exc:
+            raise ValueError(f"invalid JSON item: {value[:80]}") from exc
+
+    @staticmethod
+    def _parse_finite_float(value: str) -> float:
+        """Decode a JSON numeric token only when Python can represent it as a finite float."""
+        number = float(value)
+        if not math.isfinite(number):
+            raise ValueError("non-finite JSON number")
+        return number
 
     def _parse_number(self, value: Any) -> int | float:
         """Parse one item as a JSON number and reject booleans/objects."""

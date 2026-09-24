@@ -1,3 +1,5 @@
+import { withProperties } from "./properties.js";
+
 // -----------------------------------------------------------------------------
 // Role: Owns Array Builder modal behavior hooks.
 // File Name: block_modal.js
@@ -13,8 +15,13 @@
  *
  * @param {HTMLElement} root - Mounted Array Builder modal root.
  */
-export function mount(root) {
+function mountOwned(root) {
   if (root instanceof HTMLElement) {
     root.dataset.arrayBuilderModalReady = "true";
   }
+}
+
+/** Keep the block behavior and add properties-only accessibility. */
+export function mount(root, ...args) {
+  return withProperties(mountOwned).call(this, root, ...args);
 }
