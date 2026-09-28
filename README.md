@@ -10,9 +10,6 @@ Verified BloxSmith versions: **1.0.9** (bundled-block tests; see [test evidence]
 
 [![ARRAY — Builds one JSON array from incoming values.](media/thumbnail.webp)](media/cover.png)
 
-*Concept illustration. [Artwork and generation prompt](media/README.md).*
-
-
 ## Purpose
 
 Build a JSON array from every value received on the `items` input. Use this block when several upstream blocks must feed one runtime list.
